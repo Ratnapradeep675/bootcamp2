@@ -3,7 +3,7 @@ trigger:
 
 variables:
   TF_VERSION: '1.5.0'
-  WORKING_DIR: 'Modules/aks'
+  WORKING_DIR: 'Modules/Aks'
   SERVICE_CONNECTION: 'terraform-azure-connection'
 
 stages:
@@ -20,9 +20,13 @@ stages:
     steps:
     - checkout: self
 
-    - task: TerraformInstaller@1
-      inputs:
-        terraformVersion: $(TF_VERSION)
+    # Install Terraform manually (fixes ENOENT)
+    - script: |
+        curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+        unzip terraform.zip
+        sudo mv terraform /usr/local/bin/
+        terraform version
+      displayName: "Install Terraform Manually"
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Init"
@@ -30,7 +34,6 @@ stages:
         provider: 'azurerm'
         command: 'init'
         workingDirectory: $(WORKING_DIR)
-        backendServiceArm: $(SERVICE_CONNECTION)
         environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
         backendAzureRmResourceGroupName: 'devbackendRG'
         backendAzureRmStorageAccountName: 'devbackendstorage12345'
@@ -50,9 +53,13 @@ stages:
     steps:
     - checkout: self
 
-    - task: TerraformInstaller@1
-      inputs:
-        terraformVersion: $(TF_VERSION)
+    # Install Terraform manually
+    - script: |
+        curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+        unzip terraform.zip
+        sudo mv terraform /usr/local/bin/
+        terraform version
+      displayName: "Install Terraform Manually"
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Plan"
@@ -76,9 +83,13 @@ stages:
     steps:
     - checkout: self
 
-    - task: TerraformInstaller@1
-      inputs:
-        terraformVersion: $(TF_VERSION)
+    # Install Terraform manually
+    - script: |
+        curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+        unzip terraform.zip
+        sudo mv terraform /usr/local/bin/
+        terraform version
+      displayName: "Install Terraform Manually"
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Apply"
