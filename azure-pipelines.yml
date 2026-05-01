@@ -3,7 +3,7 @@ trigger:
 
 variables:
   TF_VERSION: '1.5.0'
-  WORKING_DIR: 'Environments/Dev'
+  WORKING_DIR: 'Modules/aks'
   SERVICE_CONNECTION: 'terraform-azure-connection'
 
 stages:
