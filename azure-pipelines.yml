@@ -1,105 +1,76 @@
 trigger:
 - main
 
+pool:
+  name: 'SelfHostedPool'
+
 variables:
-  TF_VERSION: '1.5.0'
-  WORKING_DIR: 'Modules/Aks'
-  SERVICE_CONNECTION: 'terraform-azure-connection'
+  terraformVersion: '1.6.6'
+  workingDirectory: 'Modules/Aks'
+  serviceConnection: 'terraform-azure-connection'
 
 stages:
 
-# ================= INIT =================
+# -------------------------
+# STAGE 1: TERRAFORM INIT
+# -------------------------
 - stage: Init
   displayName: "Terraform Init"
-
   jobs:
-  - job: InitJob
-    pool:
-      vmImage: 'ubuntu-latest'
-
+  - job: TerraformInit
+    displayName: "Init Job"
     steps:
-    - checkout: self
 
-    - script: |
-        curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
-        unzip terraform.zip
-        sudo mv terraform /usr/local/bin/
-        terraform version
-      displayName: "Install Terraform Manually"
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: $(terraformVersion)
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Init"
       inputs:
         provider: 'azurerm'
         command: 'init'
-        workingDirectory: $(WORKING_DIR)
+        workingDirectory: '$(workingDirectory)'
+        backendServiceArm: '$(serviceConnection)'
 
-        # REQUIRED FOR INIT (your version bug)
-        backendServiceArm: $(SERVICE_CONNECTION)
-        environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
 
-        backendAzureRmResourceGroupName: 'devbackendRG'
-        backendAzureRmStorageAccountName: 'devbackendstorage12345'
-        backendAzureRmContainerName: 'tfstate'
-        backendAzureRmKey: 'dev.tfstate'
-
-# ================= PLAN =================
+# -------------------------
+# STAGE 2: TERRAFORM PLAN
+# -------------------------
 - stage: Plan
   displayName: "Terraform Plan"
   dependsOn: Init
-
   jobs:
-  - job: PlanJob
-    pool:
-      vmImage: 'ubuntu-latest'
-
+  - job: TerraformPlan
+    displayName: "Plan Job"
     steps:
-    - checkout: self
-
-    - script: |
-        curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
-        unzip terraform.zip
-        sudo mv terraform /usr/local/bin/
-        terraform version
-      displayName: "Install Terraform Manually"
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Plan"
       inputs:
         provider: 'azurerm'
         command: 'plan'
-        workingDirectory: $(WORKING_DIR)
+        workingDirectory: '$(workingDirectory)'
+        environmentServiceNameAzureRM: '$(serviceConnection)'
 
-        # ONLY THIS FOR PLAN
-        environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
 
-# ================= APPLY =================
+# -------------------------
+# STAGE 3: TERRAFORM APPLY
+# -------------------------
 - stage: Apply
   displayName: "Terraform Apply"
   dependsOn: Plan
   condition: succeeded()
-
   jobs:
-  - job: ApplyJob
-    pool:
-      vmImage: 'ubuntu-latest'
-
+  - job: TerraformApply
+    displayName: "Apply Job"
     steps:
-    - checkout: self
-
-    - script: |
-        curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
-        unzip terraform.zip
-        sudo mv terraform /usr/local/bin/
-        terraform version
-      displayName: "Install Terraform Manually"
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Apply"
       inputs:
         provider: 'azurerm'
         command: 'apply'
-        workingDirectory: $(WORKING_DIR)
-
-        # ONLY THIS FOR APPLY
-        environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
+        workingDirectory: '$(workingDirectory)'
+        environmentServiceNameAzureRM: '$(serviceConnection)'
