@@ -50,6 +50,11 @@ stages:
     displayName: "Plan Job"
     steps:
 
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: $(terraformVersion)
+
     - task: TerraformTaskV4@4
       displayName: "Terraform Plan"
       inputs:
@@ -70,6 +75,11 @@ stages:
   - job: TerraformApply
     displayName: "Apply Job"
     steps:
+
+    - task: TerraformInstaller@1
+      displayName: "Install Terraform"
+      inputs:
+        terraformVersion: $(terraformVersion)
 
     - task: TerraformTaskV4@4
       displayName: "Terraform Apply"
