@@ -30,7 +30,7 @@ stages:
         provider: 'azurerm'
         command: 'init'
         workingDirectory: $(WORKING_DIR)
-        backendServiceArm: $(SERVICE_CONNECTION)
+        environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
         backendAzureRmResourceGroupName: 'devbackendRG'
         backendAzureRmStorageAccountName: 'devbackendstorage12345'
         backendAzureRmContainerName: 'tfstate'
@@ -59,7 +59,7 @@ stages:
         provider: 'azurerm'
         command: 'plan'
         workingDirectory: $(WORKING_DIR)
-        backendServiceArm: $(SERVICE_CONNECTION)
+        environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
 
 # ================= APPLY =================
 - stage: Apply
@@ -85,4 +85,4 @@ stages:
         provider: 'azurerm'
         command: 'apply'
         workingDirectory: $(WORKING_DIR)
-        backendServiceArm: $(SERVICE_CONNECTION)
+        environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
