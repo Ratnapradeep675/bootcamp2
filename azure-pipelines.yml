@@ -11,9 +11,9 @@ variables:
 
 stages:
 
-# -------------------------
+# ============================================================
 # STAGE 1: TERRAFORM INIT
-# -------------------------
+# ============================================================
 - stage: Init
   displayName: "Terraform Init"
   jobs:
@@ -33,11 +33,15 @@ stages:
         command: 'init'
         workingDirectory: '$(workingDirectory)'
         backendServiceArm: '$(serviceConnection)'
+        backendAzureRmResourceGroupName: 'devbackendRG'
+        backendAzureRmStorageAccountName: 'devbackendstorage12345'
+        backendAzureRmContainerName: 'tfstate'
+        backendAzureRmKey: 'dev.tfstate'
 
 
-# -------------------------
+# ============================================================
 # STAGE 2: TERRAFORM PLAN
-# -------------------------
+# ============================================================
 - stage: Plan
   displayName: "Terraform Plan"
   dependsOn: Init
@@ -55,9 +59,9 @@ stages:
         environmentServiceNameAzureRM: '$(serviceConnection)'
 
 
-# -------------------------
+# ============================================================
 # STAGE 3: TERRAFORM APPLY
-# -------------------------
+# ============================================================
 - stage: Apply
   displayName: "Terraform Apply"
   dependsOn: Plan
