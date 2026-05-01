@@ -20,7 +20,6 @@ stages:
     steps:
     - checkout: self
 
-    # Install Terraform manually (fixes ENOENT)
     - script: |
         curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
         unzip terraform.zip
@@ -34,7 +33,11 @@ stages:
         provider: 'azurerm'
         command: 'init'
         workingDirectory: $(WORKING_DIR)
+
+        # REQUIRED FOR INIT (your version bug)
+        backendServiceArm: $(SERVICE_CONNECTION)
         environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
+
         backendAzureRmResourceGroupName: 'devbackendRG'
         backendAzureRmStorageAccountName: 'devbackendstorage12345'
         backendAzureRmContainerName: 'tfstate'
@@ -53,7 +56,6 @@ stages:
     steps:
     - checkout: self
 
-    # Install Terraform manually
     - script: |
         curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
         unzip terraform.zip
@@ -67,6 +69,8 @@ stages:
         provider: 'azurerm'
         command: 'plan'
         workingDirectory: $(WORKING_DIR)
+
+        # ONLY THIS FOR PLAN
         environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
 
 # ================= APPLY =================
@@ -83,7 +87,6 @@ stages:
     steps:
     - checkout: self
 
-    # Install Terraform manually
     - script: |
         curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
         unzip terraform.zip
@@ -97,4 +100,6 @@ stages:
         provider: 'azurerm'
         command: 'apply'
         workingDirectory: $(WORKING_DIR)
+
+        # ONLY THIS FOR APPLY
         environmentServiceNameAzureRM: $(SERVICE_CONNECTION)
