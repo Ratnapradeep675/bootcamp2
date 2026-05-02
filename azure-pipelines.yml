@@ -6,7 +6,7 @@ pool:
 
 variables:
   terraformVersion: '1.6.6'
-  workingDirectory: 'Environments/Dev'
+  workingDirectory: '$(System.DefaultWorkingDirectory)/Environments/Dev'
 
 stages:
 
@@ -19,6 +19,8 @@ stages:
   - job: InitJob
     displayName: "Init Job"
     steps:
+
+    - checkout: self
 
     - task: TerraformInstaller@1
       displayName: "Install Terraform"
@@ -47,6 +49,8 @@ stages:
     displayName: "Plan Job"
     steps:
 
+    - checkout: self
+
     - task: TerraformInstaller@1
       displayName: "Install Terraform"
       inputs:
@@ -69,6 +73,8 @@ stages:
   - job: ApplyJob
     displayName: "Apply Job"
     steps:
+
+    - checkout: self
 
     - task: TerraformInstaller@1
       displayName: "Install Terraform"
