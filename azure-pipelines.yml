@@ -7,6 +7,7 @@ pool:
 variables:
   terraformVersion: '1.6.6'
   workingDirectory: 'Environments/Dev'
+  serviceConnection: 'terraform-azure-connection'
 
 stages:
 
@@ -31,6 +32,8 @@ stages:
         provider: 'azurerm'
         command: 'init'
         workingDirectory: '$(workingDirectory)'
+        backendServiceArm: '$(serviceConnection)'
+        backendAzureRmSubscriptionId: '2bf919b9-f92e-4c32-b158-13f880f09b4d'
         backendAzureRmResourceGroupName: 'devbackendRG'
         backendAzureRmStorageAccountName: 'devbackendstorage12345'
         backendAzureRmContainerName: 'tfstate'
@@ -60,6 +63,7 @@ stages:
         provider: 'azurerm'
         command: 'plan'
         workingDirectory: '$(workingDirectory)'
+        environmentServiceNameAzureRM: '$(serviceConnection)'
         commandOptions: '-var-file="dev.tfvars"'
 
 
@@ -86,4 +90,5 @@ stages:
         provider: 'azurerm'
         command: 'apply'
         workingDirectory: '$(workingDirectory)'
+        environmentServiceNameAzureRM: '$(serviceConnection)'
         commandOptions: '-var-file="dev.tfvars" -auto-approve'
