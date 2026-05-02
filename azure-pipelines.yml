@@ -14,11 +14,14 @@ stages:
 # STAGE 1: TERRAFORM INIT (SCRIPT)
 # ============================================================
 - stage: Init
+  displayName: "Terraform Init"
   jobs:
   - job: InitJob
+    displayName: "Init Job"
     steps:
 
     - task: TerraformInstaller@1
+      displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
 
@@ -34,15 +37,18 @@ stages:
 
 
 # ============================================================
-# STAGE 2: PLAN
+# STAGE 2: TERRAFORM PLAN (SCRIPT)
 # ============================================================
 - stage: Plan
+  displayName: "Terraform Plan"
   dependsOn: Init
   jobs:
   - job: PlanJob
+    displayName: "Plan Job"
     steps:
 
     - task: TerraformInstaller@1
+      displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
 
@@ -53,16 +59,19 @@ stages:
 
 
 # ============================================================
-# STAGE 3: APPLY
+# STAGE 3: TERRAFORM APPLY (SCRIPT)
 # ============================================================
 - stage: Apply
+  displayName: "Terraform Apply"
   dependsOn: Plan
   condition: succeeded()
   jobs:
   - job: ApplyJob
+    displayName: "Apply Job"
     steps:
 
     - task: TerraformInstaller@1
+      displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
 
