@@ -1,19 +1,57 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  name: 'SelfHostedPool'
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+variables:
+  terraformVersion: '1.6.6'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+stages:
+
+- stage: Init
+  jobs:
+  - job: InitJob
+    steps:
+    - checkout: self
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: $(terraformVersion)
+    - script: |
+        cd "$(Build.SourcesDirectory)/Environments/Dev"
+        terraform init \
+          -backend-config="resource_group_name=devbackendRG" \
+          -backend-config="storage_account_name=devbackendstorage12345" \
+          -backend-config="container_name=tfstate" \
+          -backend-config="key=dev.tfstate" \
+          -backend-config="sas_token=$(backend_sas)"
+      displayName: "Terraform Init"
+
+- stage: Plan
+  dependsOn: Init
+  jobs:
+  - job: PlanJob
+    steps:
+    - checkout: self
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: $(terraformVersion)
+    - script: |
+        cd "$(Build.SourcesDirectory)/Environments/Dev"
+        terraform plan -var-file="dev.tfvars"
+      displayName: "Terraform Plan"
+
+- stage: Apply
+  dependsOn: Plan
+  condition: succeeded()
+  jobs:
+  - job: ApplyJob
+    steps:
+    - checkout: self
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: $(terraformVersion)
+    - script: |
+        cd "$(Build.SourcesDirectory)/Environments/Dev"
+        terraform apply -var-file="dev.tfvars" -auto-approve
+      displayName: "Terraform Apply"
