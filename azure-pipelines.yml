@@ -37,7 +37,7 @@ stages:
         backendAzureRmStorageAccountName: 'devbackendstorage12345'
         backendAzureRmContainerName: 'tfstate'
         backendAzureRmKey: 'dev.tfstate'
-        backendAzureRmSasToken: '$(backend_sas)'   # ⭐ REQUIRED
+        backendAzureRmSasToken: '$(backend_sas)'
 
 
 # ============================================================
