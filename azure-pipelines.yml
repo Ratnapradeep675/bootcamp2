@@ -10,19 +10,16 @@ variables:
 stages:
 
 # ============================================================
-# STAGE 1: TERRAFORM INIT (SCRIPT)
+# STAGE 1: INIT
 # ============================================================
 - stage: Init
-  displayName: "Terraform Init"
   jobs:
   - job: InitJob
-    displayName: "Init Job"
     steps:
 
-    - checkout: self
+    - checkout: self   # REQUIRED — prevents decorator from deleting steps
 
     - task: TerraformInstaller@1
-      displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
 
@@ -34,24 +31,21 @@ stages:
           -backend-config="container_name=tfstate" \
           -backend-config="key=dev.tfstate" \
           -backend-config="sas_token=$(backend_sas)"
-      displayName: "Terraform Init (Script)"
+      displayName: "Terraform Init"
 
 
 # ============================================================
-# STAGE 2: TERRAFORM PLAN (SCRIPT)
+# STAGE 2: PLAN
 # ============================================================
 - stage: Plan
-  displayName: "Terraform Plan"
   dependsOn: Init
   jobs:
   - job: PlanJob
-    displayName: "Plan Job"
     steps:
 
-    - checkout: self
+    - checkout: self   # REQUIRED
 
     - task: TerraformInstaller@1
-      displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
 
@@ -62,21 +56,18 @@ stages:
 
 
 # ============================================================
-# STAGE 3: TERRAFORM APPLY (SCRIPT)
+# STAGE 3: APPLY
 # ============================================================
 - stage: Apply
-  displayName: "Terraform Apply"
   dependsOn: Plan
   condition: succeeded()
   jobs:
   - job: ApplyJob
-    displayName: "Apply Job"
     steps:
 
-    - checkout: self
+    - checkout: self   # REQUIRED
 
     - task: TerraformInstaller@1
-      displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
 
