@@ -9,14 +9,26 @@ variables:
 
 stages:
 
+# ============================================================
+# STAGE 1: TERRAFORM INIT
+# ============================================================
 - stage: Init
+  displayName: "Terraform Init"
   jobs:
   - job: InitJob
+    displayName: "Init Job"
     steps:
+
+    # REQUIRED so your repo actually downloads
     - checkout: self
+
+    # Install Terraform
     - task: TerraformInstaller@1
+      displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
+
+    # Terraform Init using SAS token
     - script: |
         cd "$(Build.SourcesDirectory)/Environments/Dev"
         terraform init \
@@ -27,30 +39,50 @@ stages:
           -backend-config="sas_token=$(backend_sas)"
       displayName: "Terraform Init"
 
+
+# ============================================================
+# STAGE 2: TERRAFORM PLAN
+# ============================================================
 - stage: Plan
+  displayName: "Terraform Plan"
   dependsOn: Init
   jobs:
   - job: PlanJob
+    displayName: "Plan Job"
     steps:
+
     - checkout: self
+
     - task: TerraformInstaller@1
+      displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
+
     - script: |
         cd "$(Build.SourcesDirectory)/Environments/Dev"
         terraform plan -var-file="dev.tfvars"
       displayName: "Terraform Plan"
 
+
+# ============================================================
+# STAGE 3: TERRAFORM APPLY
+# ============================================================
 - stage: Apply
+  displayName: "Terraform Apply"
   dependsOn: Plan
   condition: succeeded()
   jobs:
   - job: ApplyJob
+    displayName: "Apply Job"
     steps:
+
     - checkout: self
+
     - task: TerraformInstaller@1
+      displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
+
     - script: |
         cd "$(Build.SourcesDirectory)/Environments/Dev"
         terraform apply -var-file="dev.tfvars" -auto-approve
