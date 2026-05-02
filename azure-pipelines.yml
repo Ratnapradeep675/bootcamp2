@@ -37,6 +37,7 @@ stages:
         backendAzureRmStorageAccountName: 'devbackendstorage12345'
         backendAzureRmContainerName: 'tfstate'
         backendAzureRmKey: 'dev.tfstate'
+        backendAzureRmSasToken: '$(backend_sas)'   # ⭐ REQUIRED
 
 
 # ============================================================
@@ -62,6 +63,7 @@ stages:
         command: 'plan'
         workingDirectory: '$(workingDirectory)'
         environmentServiceNameAzureRM: '$(serviceConnection)'
+        commandOptions: '-var-file="dev.tfvars"'
 
 
 # ============================================================
@@ -88,3 +90,4 @@ stages:
         command: 'apply'
         workingDirectory: '$(workingDirectory)'
         environmentServiceNameAzureRM: '$(serviceConnection)'
+        commandOptions: '-var-file="dev.tfvars" -auto-approve'
