@@ -19,16 +19,13 @@ stages:
     displayName: "Init Job"
     steps:
 
-    # REQUIRED so your repo actually downloads
     - checkout: self
 
-    # Install Terraform
     - task: TerraformInstaller@1
       displayName: "Install Terraform"
       inputs:
         terraformVersion: $(terraformVersion)
 
-    # Terraform Init using SAS token
     - script: |
         cd "$(Build.SourcesDirectory)/Environments/Dev"
         terraform init \
